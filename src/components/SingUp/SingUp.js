@@ -1,5 +1,7 @@
+import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import auth from '../../firebase.init';
 import './SingUp.css'
 
 
@@ -11,6 +13,11 @@ const SingUp = () => {
     const [password , setPassword] = useState('');
     const [confirmPassword , setConfirmPassword] = useState('');
     const [error , setError] = useState('');
+
+    const [createUserWithEmailAndPassword , user] = useCreateUserWithEmailAndPassword(auth)
+    const navigate = useNavigate()
+
+
     /*
       On Blur Handle
      */
@@ -24,6 +31,10 @@ const SingUp = () => {
     const handleConfirmPasswordBlur = event=>{
         setConfirmPassword(event.target.value)
     }
+    if(user){
+        navigate('/shop');
+
+    }
 
     const handleCreateUser = event =>{
         event.preventDefault();
@@ -31,6 +42,12 @@ const SingUp = () => {
             setError("Your password didn't match")
             return;
         }
+        if(password.length <6){
+            setError("Password must be 6 characters or longer");
+            return;
+        }
+
+        createUserWithEmailAndPassword(email , password)
     }
 
     return (
@@ -50,7 +67,7 @@ const SingUp = () => {
              <label for="confirm-password">Confirm Password</label>
              <input onBlur={handleConfirmPasswordBlur} type="password" name='confirm-password' id='' required />
           </div>
-          <p style={{color:'red'}}>{}error</p>
+          <p style={{color:'red'}}>{error}</p>
            <input className='form-submit' type="submit" value="sign up" />
 
          </form>
